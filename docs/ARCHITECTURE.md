@@ -1,4 +1,4 @@
-# ResearchPilot 系统架构
+# 研舵 ThesisHelm 系统架构
 
 ## 1. 运行流程
 

@@ -12,15 +12,15 @@ async function render(path = "/") {
   );
 }
 
-test("server-renders the ResearchPilot multi-agent workspace", async () => {
+test("server-renders the ThesisHelm multi-agent workspace", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
   assert.match(html, /<html lang="zh-CN">/i);
-  assert.match(html, /ResearchPilot/);
-  assert.match(html, /AI 研究团队/);
+  assert.match(html, /ThesisHelm/);
+  assert.match(html, /判断由你掌舵/);
   assert.match(html, /主协调 Agent/);
   assert.match(html, /不构成投资建议/);
   assert.doesNotMatch(html, /codex-preview|SkeletonPreview|react-loading-skeleton/);
@@ -29,7 +29,7 @@ test("server-renders the ResearchPilot multi-agent workspace", async () => {
 test("emits product-specific sharing metadata", async () => {
   const response = await render();
   const html = await response.text();
-  assert.match(html, /property="og:title" content="ResearchPilot/);
+  assert.match(html, /property="og:title" content="研舵 ThesisHelm/);
   assert.match(html, /property="og:image" content="http:\/\/localhost(?::3000)?\/og\.png"/);
   assert.match(html, /name="twitter:card" content="summary_large_image"/);
 });

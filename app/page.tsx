@@ -216,7 +216,7 @@ export default function Home() {
   return (
     <main className="rp-shell">
       <aside className="rp-sidebar">
-        <a className="rp-brand" href="#top"><span>RP</span><div><b>ResearchPilot</b><small>Multi-agent research desk</small></div></a>
+        <a className="rp-brand" href="#top"><span>舵</span><div><b>研舵 ThesisHelm</b><small>Multi-agent research desk</small></div></a>
         <nav aria-label="主导航">
           <a className="active" href="#research">研究任务</a>
           <a href="#workflow">Agent 架构</a>
@@ -235,7 +235,7 @@ export default function Home() {
 
         <section className="rp-hero" id="research">
           <p className="rp-eyebrow">AUTONOMOUS INVESTMENT RESEARCH</p>
-          <h1>把资料搜集交给<br />一支 AI 研究团队。</h1>
+          <h1>资料由 AI 搜集，<br />判断由你掌舵。</h1>
           <p className="rp-hero-copy">输入一只 A 股和研究问题，主协调 Agent 将并行调度公司概况、行业宏观和综合分析师，最后生成一份有来源、保留分歧的研究简报。</p>
 
           <div className="rp-command-card">
@@ -282,7 +282,7 @@ export default function Home() {
           <section className="rp-sources" id="sources"><div className="rp-section-heading"><div><p className="rp-eyebrow">SOURCE INDEX</p><h2>每条资料都可以回到来源。</h2></div><p>{result.sourceIndex.length} 个来源 · Tushare 结构化数据与 Tavily 公开网页</p></div><div>{result.sourceIndex.map((source) => <article key={source.ref}><span>{source.ref}</span><div>{source.url ? <a href={source.url} target="_blank" rel="noreferrer">{source.title}</a> : <b>{source.title}</b>}<small>{source.detail}</small></div><em>{source.kind === "web" ? "网页" : "数据"}</em></article>)}</div></section>
         </section>}
 
-        <footer className="rp-footer"><b>ResearchPilot</b><p>AI 生成内容仅供研究参考，不构成投资建议。请独立核验重要事实并作出自己的判断。</p></footer>
+        <footer className="rp-footer"><b>研舵 ThesisHelm</b><p>AI 生成内容仅供研究参考，不构成投资建议。请独立核验重要事实并作出自己的判断。</p></footer>
       </section>
 
       {settingsOpen && <div className="rp-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSettingsOpen(false); }}><section className="rp-settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title"><header><div><p className="rp-eyebrow">CONNECTION SETTINGS</p><h2 id="settings-title">模型与数据连接</h2><p>DeepSeek 与 Tavily Key 加密保存，网页无法回读明文。</p></div><button type="button" onClick={() => setSettingsOpen(false)} aria-label="关闭设置">×</button></header><div className="rp-connection-status"><div className={providerSettings?.tushare.configured ? "connected" : ""}><span /><b>Tushare</b><small>{providerSettings?.tushare.configured ? `${providerSettings.tushare.points} 积分` : "未配置"}</small></div><div className={providerSettings?.hasApiKey ? "connected" : ""}><span /><b>DeepSeek</b><small>{providerSettings?.hasApiKey ? "已配置" : "必填"}</small></div><div className={providerSettings?.hasSearchApiKey ? "connected" : ""}><span /><b>Tavily</b><small>{providerSettings?.hasSearchApiKey ? "已配置" : "必填"}</small></div></div><form onSubmit={saveSettings}><label htmlFor="deepseek-key">DeepSeek API Key</label><input id="deepseek-key" type="password" autoComplete="new-password" value={deepseekKey} onChange={(event) => setDeepseekKey(event.target.value)} placeholder={providerSettings?.hasApiKey ? "已配置；留空保留" : "sk-…"} disabled={settingsLoading || settingsSaving} /><label htmlFor="tavily-key">Tavily API Key</label><input id="tavily-key" type="password" autoComplete="new-password" value={tavilyKey} onChange={(event) => setTavilyKey(event.target.value)} placeholder={providerSettings?.hasSearchApiKey ? "已配置；留空保留" : "tvly-…"} disabled={settingsLoading || settingsSaving} /><label htmlFor="deepseek-model">模型 ID</label><input id="deepseek-model" list="deepseek-models" value={deepseekModel} onChange={(event) => setDeepseekModel(event.target.value)} spellCheck={false} disabled={settingsLoading || settingsSaving} /><datalist id="deepseek-models"><option value="deepseek-v4-flash" /><option value="deepseek-v4-pro" /></datalist>{settingsMessage && <p className={settingsMessage.includes("已安全保存") ? "success" : ""} role="status">{settingsMessage}</p>}<div><button type="button" onClick={() => setSettingsOpen(false)}>取消</button><button type="submit" disabled={settingsLoading || settingsSaving}>{settingsSaving ? "保存中…" : "加密保存"}</button></div></form></section></div>}

@@ -1,10 +1,10 @@
-# ResearchPilot
+# 研舵 ThesisHelm
 
-> 把资料搜集交给一支 AI 研究团队。
+> 资料由 AI 搜集，判断由你掌舵。
 
-ResearchPilot 是一个面向 A 股研究的多 Agent 投研助手。用户输入股票代码和研究问题后，主协调 Agent 会准备 Tushare 结构化数据和 Tavily 公开资料，并行调度三个专业分析 Agent，最后由报告总结 Agent 生成研究简报。
+研舵 ThesisHelm 是一个面向 A 股研究的多 Agent 投研助手。用户输入股票代码和研究问题后，主协调 Agent 会准备 Tushare 结构化数据和 Tavily 公开资料，并行调度三个专业分析 Agent，最后由报告总结 Agent 生成研究简报。
 
-本项目参考 [InvestPilot](https://github.com/junglego3/InvestPilot) 的角色分工和“结构化数据 + 联网搜索 + 专业报告”工作流，代码为独立实现，不复制其源码、提示词或品牌。
+本项目参考 [InvestPilot](https://github.com/junglego3/InvestPilot) 的角色分工和“结构化数据 + 联网搜索 + 专业报告”工作流，代码为独立实现，不复制其源码、提示词或品牌。“研舵”强调 AI 负责研究协作，而最终方向由用户掌握。
 
 ## 架构
 
