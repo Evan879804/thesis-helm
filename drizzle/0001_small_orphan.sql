@@ -1,0 +1,1 @@
+ALTER TABLE `provider_settings` ADD `encrypted_search_api_key` text;
