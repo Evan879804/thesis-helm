@@ -11,14 +11,14 @@ export async function generateMetadata(): Promise<Metadata> {
   const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host") ?? "localhost:3000";
   const protocol = requestHeaders.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
   const origin = `${protocol}://${host}`;
-  const title = "ResearchPilot｜多 Agent 智能投研助手";
-  const description = "主协调 Agent 并行调度公司、行业与综合分析师，从数据和公开资料到研究简报。";
+  const title = "研舵 ThesisHelm｜多 Agent 智能投研助手";
+  const description = "资料由 AI 搜集，判断由你掌舵。主协调 Agent 并行调度专业分析师生成研究简报。";
   const image = `${origin}/og.png`;
 
   return {
     title,
     description,
-    openGraph: { title, description, type: "website", images: [{ url: image, width: 1734, height: 908, alt: "ResearchPilot 社交预览" }] },
+    openGraph: { title, description, type: "website", images: [{ url: image, width: 1730, height: 909, alt: "研舵 ThesisHelm 社交预览" }] },
     twitter: { card: "summary_large_image", title, description, images: [image] },
   };
 }
