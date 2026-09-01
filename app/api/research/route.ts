@@ -4,8 +4,8 @@ import { decryptSecret } from "../../../lib/secret-vault";
 import { collectWebResearch, type WebResearchSource } from "../../../lib/tavily";
 import { fetchResearchSnapshot } from "../../../lib/tushare";
 
-type RuntimeEnv = { DB: D1Database; SETTINGS_ENCRYPTION_KEY?: string; TUSHARE_TOKEN?: string };
-type ProviderRow = { base_url: string; model: string; encrypted_api_key: string | null; encrypted_search_api_key: string | null };
+type RuntimeEnv = { DB: D1Database; SETTINGS_ENCRYPTION_KEY?: string };
+type ProviderRow = { base_url: string; model: string; encrypted_api_key: string | null; encrypted_search_api_key: string | null; encrypted_tushare_token: string | null };
 
 type AnalystReport = {
   agent: "company-analyst" | "industry-analyst" | "comprehensive-analyst";
@@ -130,23 +130,24 @@ export async function POST(request: Request): Promise<Response> {
   if (!/^\d{6}\.(SH|SZ|BJ)$/.test(tsCode)) return json({ code: "UNSUPPORTED_MARKET", error: "当前版本仅支持 A 股标准代码，如 300750.SZ" }, 400);
 
   const runtime = runtimeEnv();
-  if (!runtime.TUSHARE_TOKEN) return json({ code: "TUSHARE_NOT_CONFIGURED", error: "服务端尚未配置 Tushare Token" }, 503);
   if (!runtime.SETTINGS_ENCRYPTION_KEY) return json({ code: "ENCRYPTION_NOT_CONFIGURED", error: "服务端尚未配置密钥加密功能" }, 503);
 
   const settings = await runtime.DB.prepare(
-    "SELECT base_url, model, encrypted_api_key, encrypted_search_api_key FROM provider_settings WHERE user_id = ?",
+    "SELECT base_url, model, encrypted_api_key, encrypted_search_api_key, encrypted_tushare_token FROM provider_settings WHERE user_id = ?",
   ).bind(userId).first<ProviderRow>();
   if (!settings?.encrypted_api_key) return json({ code: "MODEL_NOT_CONFIGURED", error: "请先在“模型与数据”中填写 DeepSeek API Key" }, 409);
   if (!settings.encrypted_search_api_key) return json({ code: "SEARCH_NOT_CONFIGURED", error: "复现 InvestPilot 架构需要联网搜索，请先填写 Tavily API Key" }, 409);
+  if (!settings.encrypted_tushare_token) return json({ code: "TUSHARE_NOT_CONFIGURED", error: "请先在“模型与数据”中填写 Tushare Token" }, 409);
 
   try {
-    const [apiKey, searchApiKey] = await Promise.all([
+    const [apiKey, searchApiKey, tushareToken] = await Promise.all([
       decryptSecret(settings.encrypted_api_key, runtime.SETTINGS_ENCRYPTION_KEY),
       decryptSecret(settings.encrypted_search_api_key, runtime.SETTINGS_ENCRYPTION_KEY),
+      decryptSecret(settings.encrypted_tushare_token, runtime.SETTINGS_ENCRYPTION_KEY),
     ]);
 
     const collectionStartedAt = Date.now();
-    const snapshot = await fetchResearchSnapshot(runtime.TUSHARE_TOKEN, tsCode);
+    const snapshot = await fetchResearchSnapshot(tushareToken, tsCode);
     const webSources = await collectWebResearch(searchApiKey, snapshot.company.name, tsCode, snapshot.company.industry);
     const collectionElapsedMs = Date.now() - collectionStartedAt;
     const webPacket = sourcePacket(webSources);
