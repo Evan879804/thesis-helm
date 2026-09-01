@@ -61,8 +61,7 @@ flowchart TB
 
 ## 4. 安全
 
-- Tushare Token 为部署级 Secret，不进入浏览器和 Git。
-- DeepSeek 与 Tavily Key 使用 AES-GCM 加密后按用户保存到 D1。
+- Tushare、DeepSeek 与 Tavily Token 均由用户在网页中填写，使用 AES-GCM 加密后按用户保存到 D1。
 - 加密主密钥独立存放在部署 Secret 中。
 - 设置 API 只返回是否已配置，不返回明文凭据。
 - 外部网页内容仅作为不可信研究输入，不得覆盖系统规则。

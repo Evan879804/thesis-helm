@@ -46,10 +46,12 @@ flowchart LR
 
 ## 数据与模型
 
-- Tushare：A 股行情、估值、财务指标
+- Tushare：A 股行情、估值、财务指标；Token 由用户在网页设置
 - Tavily：公司官网、公告新闻、行业、政策和宏观资料搜索
 - DeepSeek：三个分析子 Agent 与一个报告总结 Agent
-- D1：按登录用户保存加密后的 DeepSeek/Tavily API Key
+- D1：按登录用户保存加密后的 Tushare、DeepSeek 与 Tavily Token
+
+首次使用时，点击网页左下角“模型与数据设置”，填写三种 Token 和 DeepSeek 模型 ID。三种凭据均由服务端使用 AES-GCM 加密，保存后页面只显示配置状态，不返回明文。
 
 每次完整研究包含 4 次模型调用：三个分析 Agent 并行，完成后调用一次报告总结 Agent。
 
@@ -77,7 +79,7 @@ npm test
 npm run lint
 ```
 
-本地环境变量示例见 `.env.example`。不要提交真实凭据。
+本地环境变量仅需配置用于加密用户凭据的 `SETTINGS_ENCRYPTION_KEY`，示例见 `.env.example`。不要提交真实凭据。
 
 ## 文档
 

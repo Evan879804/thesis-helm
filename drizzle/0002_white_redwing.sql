@@ -1,0 +1,1 @@
+ALTER TABLE `provider_settings` ADD `encrypted_tushare_token` text;

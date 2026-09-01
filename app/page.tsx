@@ -8,8 +8,8 @@ type ProviderSettings = {
   model: string;
   hasApiKey: boolean;
   hasSearchApiKey: boolean;
+  hasTushareToken: boolean;
   updatedAt: string | null;
-  tushare: { configured: boolean; points: number };
 };
 
 type AnalystReport = {
@@ -91,6 +91,7 @@ export default function Home() {
   const [providerSettings, setProviderSettings] = useState<ProviderSettings | null>(null);
   const [deepseekKey, setDeepseekKey] = useState("");
   const [tavilyKey, setTavilyKey] = useState("");
+  const [tushareToken, setTushareToken] = useState("");
   const [deepseekModel, setDeepseekModel] = useState("deepseek-v4-flash");
   const questionRef = useRef<HTMLTextAreaElement>(null);
 
@@ -131,13 +132,14 @@ export default function Home() {
       const response = await fetch("/api/settings", {
         method: "PUT",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ apiKey: deepseekKey, searchApiKey: tavilyKey, model: deepseekModel }),
+        body: JSON.stringify({ apiKey: deepseekKey, searchApiKey: tavilyKey, tushareToken, model: deepseekModel }),
       });
       const data = await response.json() as ProviderSettings & { error?: string };
       if (!response.ok) throw new Error(data.error || "保存失败");
       setProviderSettings(data);
       setDeepseekKey("");
       setTavilyKey("");
+      setTushareToken("");
       setSettingsMessage("连接设置已安全保存");
     } catch (settingsError) {
       setSettingsMessage(settingsError instanceof Error ? settingsError.message : "保存失败");
@@ -170,7 +172,7 @@ export default function Home() {
       });
       const data = await response.json() as ResearchResult & { code?: string; error?: string };
       if (!response.ok) {
-        if (data.code === "MODEL_NOT_CONFIGURED" || data.code === "SEARCH_NOT_CONFIGURED") await openSettings();
+        if (data.code === "MODEL_NOT_CONFIGURED" || data.code === "SEARCH_NOT_CONFIGURED" || data.code === "TUSHARE_NOT_CONFIGURED") await openSettings();
         throw new Error(data.error || "研究任务失败");
       }
       setResult(data);
@@ -285,7 +287,7 @@ export default function Home() {
         <footer className="rp-footer"><b>研舵 ThesisHelm</b><p>AI 生成内容仅供研究参考，不构成投资建议。请独立核验重要事实并作出自己的判断。</p></footer>
       </section>
 
-      {settingsOpen && <div className="rp-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSettingsOpen(false); }}><section className="rp-settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title"><header><div><p className="rp-eyebrow">CONNECTION SETTINGS</p><h2 id="settings-title">模型与数据连接</h2><p>DeepSeek 与 Tavily Key 加密保存，网页无法回读明文。</p></div><button type="button" onClick={() => setSettingsOpen(false)} aria-label="关闭设置">×</button></header><div className="rp-connection-status"><div className={providerSettings?.tushare.configured ? "connected" : ""}><span /><b>Tushare</b><small>{providerSettings?.tushare.configured ? `${providerSettings.tushare.points} 积分` : "未配置"}</small></div><div className={providerSettings?.hasApiKey ? "connected" : ""}><span /><b>DeepSeek</b><small>{providerSettings?.hasApiKey ? "已配置" : "必填"}</small></div><div className={providerSettings?.hasSearchApiKey ? "connected" : ""}><span /><b>Tavily</b><small>{providerSettings?.hasSearchApiKey ? "已配置" : "必填"}</small></div></div><form onSubmit={saveSettings}><label htmlFor="deepseek-key">DeepSeek API Key</label><input id="deepseek-key" type="password" autoComplete="new-password" value={deepseekKey} onChange={(event) => setDeepseekKey(event.target.value)} placeholder={providerSettings?.hasApiKey ? "已配置；留空保留" : "sk-…"} disabled={settingsLoading || settingsSaving} /><label htmlFor="tavily-key">Tavily API Key</label><input id="tavily-key" type="password" autoComplete="new-password" value={tavilyKey} onChange={(event) => setTavilyKey(event.target.value)} placeholder={providerSettings?.hasSearchApiKey ? "已配置；留空保留" : "tvly-…"} disabled={settingsLoading || settingsSaving} /><label htmlFor="deepseek-model">模型 ID</label><input id="deepseek-model" list="deepseek-models" value={deepseekModel} onChange={(event) => setDeepseekModel(event.target.value)} spellCheck={false} disabled={settingsLoading || settingsSaving} /><datalist id="deepseek-models"><option value="deepseek-v4-flash" /><option value="deepseek-v4-pro" /></datalist>{settingsMessage && <p className={settingsMessage.includes("已安全保存") ? "success" : ""} role="status">{settingsMessage}</p>}<div><button type="button" onClick={() => setSettingsOpen(false)}>取消</button><button type="submit" disabled={settingsLoading || settingsSaving}>{settingsSaving ? "保存中…" : "加密保存"}</button></div></form></section></div>}
+      {settingsOpen && <div className="rp-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSettingsOpen(false); }}><section className="rp-settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title"><header><div><p className="rp-eyebrow">CONNECTION SETTINGS</p><h2 id="settings-title">模型与数据连接</h2><p>Tushare、DeepSeek 与 Tavily Token 均加密保存，网页无法回读明文。</p></div><button type="button" onClick={() => setSettingsOpen(false)} aria-label="关闭设置">×</button></header><div className="rp-connection-status"><div className={providerSettings?.hasTushareToken ? "connected" : ""}><span /><b>Tushare</b><small>{providerSettings?.hasTushareToken ? "已配置" : "必填"}</small></div><div className={providerSettings?.hasApiKey ? "connected" : ""}><span /><b>DeepSeek</b><small>{providerSettings?.hasApiKey ? "已配置" : "必填"}</small></div><div className={providerSettings?.hasSearchApiKey ? "connected" : ""}><span /><b>Tavily</b><small>{providerSettings?.hasSearchApiKey ? "已配置" : "必填"}</small></div></div><form onSubmit={saveSettings}><label htmlFor="tushare-token">Tushare Token</label><input id="tushare-token" type="password" autoComplete="new-password" value={tushareToken} onChange={(event) => setTushareToken(event.target.value)} placeholder={providerSettings?.hasTushareToken ? "已配置；留空保留" : "输入 Tushare Token"} disabled={settingsLoading || settingsSaving} /><label htmlFor="deepseek-key">DeepSeek API Key</label><input id="deepseek-key" type="password" autoComplete="new-password" value={deepseekKey} onChange={(event) => setDeepseekKey(event.target.value)} placeholder={providerSettings?.hasApiKey ? "已配置；留空保留" : "sk-…"} disabled={settingsLoading || settingsSaving} /><label htmlFor="tavily-key">Tavily API Key</label><input id="tavily-key" type="password" autoComplete="new-password" value={tavilyKey} onChange={(event) => setTavilyKey(event.target.value)} placeholder={providerSettings?.hasSearchApiKey ? "已配置；留空保留" : "tvly-…"} disabled={settingsLoading || settingsSaving} /><label htmlFor="deepseek-model">模型 ID</label><input id="deepseek-model" list="deepseek-models" value={deepseekModel} onChange={(event) => setDeepseekModel(event.target.value)} spellCheck={false} disabled={settingsLoading || settingsSaving} /><datalist id="deepseek-models"><option value="deepseek-v4-flash" /><option value="deepseek-v4-pro" /></datalist>{settingsMessage && <p className={settingsMessage.includes("已安全保存") ? "success" : ""} role="status">{settingsMessage}</p>}<div><button type="button" onClick={() => setSettingsOpen(false)}>取消</button><button type="submit" disabled={settingsLoading || settingsSaving}>{settingsSaving ? "保存中…" : "加密保存"}</button></div></form></section></div>}
     </main>
   );
 }
